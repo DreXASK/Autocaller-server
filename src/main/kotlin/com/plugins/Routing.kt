@@ -1,7 +1,9 @@
 package com.plugins
 
 import com.ServerConnectionStatus
-import connectionAdjusterScreen.data.remote.dto.TokenRequest
+import com.dto.AdminTokenResponse
+import com.dto.ClientTokenResponse
+import com.dto.ClientTokenStatusResponse
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -9,10 +11,13 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
     routing {
         get("/registerClient") {
-            call.respond(TokenRequest("123"))
+            call.respond(ClientTokenResponse("ClientToken123"))
         }
         get("/check_token_status"){
-            call.respond(ServerConnectionStatus.Connected)
+            call.respond(ClientTokenStatusResponse(ServerConnectionStatus.Connected))
+        }
+        get("/admin_authorization"){
+            call.respond(AdminTokenResponse("AdminToken123"))
         }
     }
 }
