@@ -18,29 +18,29 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-fun main() {
+suspend fun main() {
+
+    var server: ApplicationEngine? = null
+    val serverJob = CoroutineScope(Dispatchers.Default).launch {
+        server = embeddedServer(io.ktor.server.cio.CIO, port = 8080, host = "0.0.0.0", module = Application::module)
+        server?.start(wait = true) ?: throw Exception("Server is null")
+    }
+
     CoroutineScope(Dispatchers.Default).launch {
 
-        delay(5000)
-
-        val httpClient = HttpClient(CIO) {
-            //    install(Logging) { level = LogLevel.ALL }
-            install(ContentNegotiation) {
-                json()
+        while(true) {
+            val command = readln()
+            when(command) {
+                "authKey" -> println("The authentication key has been successfully created #rjejri23jrci23j")
+                "lol" -> println("lol)")
+                "close" -> server?.stop()
+                else -> println("Command has not been recognized")
             }
         }
 
-        val token = httpClient.get {
-            url("http://localhost:8080/register_client")
-        }.body<ClientTokenResponse>().token
-
-        println(token)
-
     }
 
-    embeddedServer(io.ktor.server.cio.CIO, port = 8080, host = "0.0.0.0", module = Application::module)
-        .start(wait = true)
-
+    serverJob.join()
 }
 
 fun Application.module() {
