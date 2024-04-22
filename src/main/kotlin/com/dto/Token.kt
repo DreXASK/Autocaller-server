@@ -1,14 +1,13 @@
 package com.dto
 
-import com.ServerConnectionStatus
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ClientTokenRequest(
+data class TokenRequest(
 	val token: String
 )
 
 @Serializable
-data class ClientTokenResponse(
+data class TokenResponse(
 	val token: String
 )
