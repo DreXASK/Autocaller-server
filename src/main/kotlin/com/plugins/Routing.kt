@@ -19,10 +19,7 @@ fun Application.configureRouting() {
             val tokenStatusRequest = call.receive<TokenStatusRequest>()
             val token = tokenStatusRequest.token
 
-            if (token.length >= 5 && token.substring(0..4) == "[E2E]")
-                call.respond(TokenStatusResponse(TokenStatus.UNREGISTERED))
-            else
-                call.respond(TokenStatusResponse(TokenStatus.REGISTERED))
+            call.respond(TokenStatusResponse(TokenStatus.UNREGISTERED))
         }
     }
 }
