@@ -1,1 +1,1 @@
-rootProject.name = "com.autocaller-server"
+rootProject.name = "autocaller.server"
