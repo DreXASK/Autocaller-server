@@ -1,0 +1,3 @@
+package com
+
+interface Error
