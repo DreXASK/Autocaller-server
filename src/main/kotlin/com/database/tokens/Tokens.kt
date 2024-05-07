@@ -2,17 +2,19 @@ package com.database.tokens
 
 import com.utils.DataError
 import com.utils.Result
+import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.autoIncColumnType
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object Tokens : Table() {
+object Tokens : LongIdTable() {
 
-    private val id = long("id")
     private val token = varchar("token", 36)
 
-    fun insert(tokenDTO: TokenDTO) {
+    fun insert(tokenDTO: TokenDto) {
         transaction {
             Tokens.insert {
                 it[token] = tokenDTO.token
@@ -20,12 +22,12 @@ object Tokens : Table() {
         }
     }
 
-    fun fetch(token: String): Result<TokenDTO, DataError.TokenError.TokenDoesNotExist> {
+    fun fetch(token: String): Result<TokenDto, DataError.TokenError.TokenDoesNotExist> {
         return try {
             transaction{
                 val tokenModel = Tokens.selectAll().where { Tokens.token.eq(token) }.single()
-                val tokenDTO = TokenDTO(
-                    autoIncId = tokenModel[Tokens.id],
+                val tokenDTO = TokenDto(
+                    autoIncId = tokenModel[Tokens.id].value,
                     token = tokenModel[Tokens.token],
                 )
                 Result.Success(tokenDTO)
@@ -35,16 +37,16 @@ object Tokens : Table() {
         }
     }
 
-    fun fetchAll(): Result<List<TokenDTO>, DataError.TokenError> {
+    fun fetchAll(): Result<List<TokenDto>, DataError.TokenError> {
         return try {
             transaction {
-                val tokenDtoList = mutableListOf<TokenDTO>()
+                val tokenDtoList = mutableListOf<TokenDto>()
                 val tokenModel = Tokens.selectAll().toList()
 
                 tokenModel.map {
                     tokenDtoList.add(
-                        TokenDTO(
-                            autoIncId = it[Tokens.id],
+                        TokenDto(
+                            autoIncId = it[Tokens.id].value,
                             token = it[token],
                         )
                     )

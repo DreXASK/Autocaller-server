@@ -1,10 +1,9 @@
-package com.features.getTasks
+package com.features.callTasks
 
-import com.features.login.LoginController
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 
-fun Application.getTasksRouting() {
+fun Application.callTasksRouting() {
     routing {
         get("/send_tasks"){
 

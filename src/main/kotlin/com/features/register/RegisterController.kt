@@ -1,6 +1,6 @@
 package com.features.register
 
-import com.database.tokens.TokenDTO
+import com.database.tokens.TokenDto
 import com.database.tokens.Tokens
 import com.utils.DataError
 import com.utils.Result
@@ -11,7 +11,7 @@ object RegisterController {
     fun performRegister(): Result<String, DataError.TokenError.TokenCreationError> {
         return try {
             val token = UUID.randomUUID().toString()
-            val tokenDTO = TokenDTO(autoIncId = null, token = token)
+            val tokenDTO = TokenDto(autoIncId = null, token = token)
             Tokens.insert(tokenDTO)
             Result.Success(token)
         } catch (e: Exception) {
