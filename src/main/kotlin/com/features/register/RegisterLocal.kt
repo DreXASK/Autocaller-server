@@ -1,13 +1,13 @@
-package com.dto
+package com.features.register
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TokenRequest(
+data class RegisterReceiveLocal(
 	val connectionSecretKey: String
 )
 
 @Serializable
-data class TokenResponse(
+data class RegisterResponseLocal(
 	val token: String
 )

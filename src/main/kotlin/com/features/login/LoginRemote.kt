@@ -1,14 +1,14 @@
-package com.dto
+package com.features.login
 
-import com.TokenStatus
+import com.utils.TokenStatus
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TokenStatusRequest(
+data class LoginReceiveRemote(
 	val token: String
 )
 
 @Serializable
-data class TokenStatusResponse(
+data class LoginResponseRemote(
 	val tokenStatus: TokenStatus
 )

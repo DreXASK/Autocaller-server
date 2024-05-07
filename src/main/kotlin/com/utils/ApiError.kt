@@ -1,4 +1,4 @@
-package com
+package com.utils
 
 sealed interface ApiError: Error {
     enum class TokenError: ApiError {

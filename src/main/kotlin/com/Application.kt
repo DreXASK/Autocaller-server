@@ -1,5 +1,8 @@
 package com
 
+import com.database.tokens.Tokens
+import com.features.login.configureLoginRouting
+import com.features.register.configureRegisterRouting
 import com.plugins.*
 
 import io.ktor.server.application.*
@@ -7,9 +10,13 @@ import io.ktor.server.engine.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jetbrains.exposed.sql.Database
 
 
 suspend fun main() {
+
+    Database.connect("jdbc:postgresql://localhost:5432/autocaller", driver = "org.postgresql.Driver",
+        user = "postgres", password = "admin")
 
     var server: ApplicationEngine? = null
     val serverJob = CoroutineScope(Dispatchers.Default).launch {
@@ -35,6 +42,8 @@ suspend fun main() {
 }
 
 fun Application.module() {
-    configureSerialization()
     configureRouting()
+    configureLoginRouting()
+    configureRegisterRouting()
+    configureSerialization()
 }
