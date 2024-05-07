@@ -2,26 +2,21 @@ package com.features.register
 
 import com.database.tokens.TokenDTO
 import com.database.tokens.Tokens
-import com.utils.TokenStatus
-import io.ktor.server.application.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
+import com.utils.DataError
+import com.utils.Result
 import java.util.UUID
 
-class RegisterController(private val call: ApplicationCall) {
+object RegisterController {
 
-    suspend fun performRegister() {
-
-            val receive = call.receive<RegisterReceiveLocal>()
-
-            println("Received secret key = ${receive.connectionSecretKey}")
-
+    fun performRegister(): Result<String, DataError.TokenError.TokenCreationError> {
+        return try {
             val token = UUID.randomUUID().toString()
-            val tokenDTO = TokenDTO(rowId = null, token = token, tokenStatus = TokenStatus.REGISTERED )
-
+            val tokenDTO = TokenDTO(autoIncId = null, token = token)
             Tokens.insert(tokenDTO)
-            call.respond(RegisterResponseLocal(token))
-
+            Result.Success(token)
+        } catch (e: Exception) {
+            Result.Error(DataError.TokenError.TokenCreationError(e))
+        }
     }
 
 }

@@ -16,13 +16,10 @@ class LoginController(private val call: ApplicationCall) {
         val receive = call.receive<LoginReceiveRemote>()
 
         when (val result = Tokens.fetch(receive.token)) {
-            is Result.Success -> {
-                if (result.data.tokenStatus == TokenStatus.REGISTERED) call.respond(LoginResponseRemote(TokenStatus.REGISTERED))
-                else call.respond(LoginResponseRemote(TokenStatus.UNREGISTERED))
-            }
+            is Result.Success -> call.respond(LoginResponseRemote(TokenStatus.REGISTERED))
             is Result.Error -> {
                 when (result.error) {
-                    DataError.TokenStatusError.TOKEN_DOES_NOT_EXIST -> {
+                    DataError.TokenError.TokenDoesNotExist -> {
                         call.respond(HttpStatusCode.BadRequest, ApiError.TokenStatusError.INVALID_TOKEN)
                     }
                 }
