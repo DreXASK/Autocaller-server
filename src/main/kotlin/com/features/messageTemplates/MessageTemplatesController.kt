@@ -1,6 +1,6 @@
-package com.features.callTasks
+package com.features.messageTemplates
 
-import com.database.callTasks.CallTasks
+import com.database.messageTemplates.MessageTemplates
 import com.database.tokens.Tokens
 import com.utils.ApiError
 import com.utils.DataError
@@ -10,19 +10,19 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 
-class CallTasksController(private val call: ApplicationCall) {
+class MessageTemplatesController(private val call: ApplicationCall) {
 
-    suspend fun getCallTasksFromClient() {
-        val receive = call.receive<GetCallTasksReceiveRemote>()
+    suspend fun getMessageTemplateFromClient() {
+        val receive = call.receive<GetMessageTemplateReceiveRemote>()
 
         auth(receive.token)
 
-        val callTaskDtoList = receive.list
-        when (val result = CallTasks.insert(callTaskDtoList)) {
+        val messageTemplateDto = receive.messageTemplate
+        when (val result = MessageTemplates.insert(messageTemplateDto)) {
             is Result.Success -> call.respond(HttpStatusCode.OK)
             is Result.Error -> {
                 when (result.error) {
-                    is DataError.CallTaskError.Insert.UnknownError ->
+                    is DataError.MessageTemplateError.Insert.UnknownError ->
                         call.respond(
                             HttpStatusCode.BadRequest,
                             ApiError.CallTasksError.Remote.UnknownError(result.error.e)
@@ -32,32 +32,32 @@ class CallTasksController(private val call: ApplicationCall) {
         }
     }
 
-    suspend fun sendCallTasksToClient() {
-        val receive = call.receive<SendCallTasksReceiveRemote>()
+    suspend fun sendMessageTemplatesToClient() {
+        val receive = call.receive<SendMessageTemplatesReceiveRemote>()
 
         auth(receive.token)
 
-        when (val result = CallTasks.fetchAll()) {
+        when (val result = MessageTemplates.fetchAll()) {
             is Result.Success -> call.respond(result.data)
             is Result.Error -> {
                 when (result.error) {
-                    is DataError.CallTaskError.Fetch.CallTaskDoesNotExist ->
+                    is DataError.MessageTemplateError.Fetch.MessageTemplateDoesNotExist ->
                         call.respond(HttpStatusCode.BadRequest, ApiError.CallTasksError.Remote.UnknownError(null))
                 }
             }
         }
     }
 
-    suspend fun removeCallTask() {
-        val receive = call.receive<RemoveCallTaskReceiveRemote>()
+    suspend fun removeMessageTemplate() {
+        val receive = call.receive<RemoveMessageTemplateReceiveRemote>()
 
         auth(receive.token)
 
-        when (val result = CallTasks.remove(receive.id)) {
+        when (val result = MessageTemplates.remove(receive.id)) {
             is Result.Success -> call.respond(HttpStatusCode.OK)
             is Result.Error -> {
                 when (result.error) {
-                    is DataError.CallTaskError.Remove.UnknownError -> call.respond(
+                    is DataError.MessageTemplateError.Remove.UnknownError -> call.respond(
                         HttpStatusCode.BadRequest,
                         ApiError.CallTasksError.Remote.UnknownError(result.error.e)
                     )

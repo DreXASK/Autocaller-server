@@ -16,4 +16,15 @@ sealed interface DataError: Error {
             data class UnknownError(val e: Exception): Remove
         }
     }
+    sealed interface MessageTemplateError: DataError {
+        sealed interface Insert: MessageTemplateError {
+            data class UnknownError(val e: Exception): Insert
+        }
+        sealed interface Fetch: MessageTemplateError {
+            data object MessageTemplateDoesNotExist: Fetch
+        }
+        sealed interface Remove: MessageTemplateError {
+            data class UnknownError(val e: Exception): Remove
+        }
+    }
 }

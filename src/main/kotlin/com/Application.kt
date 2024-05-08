@@ -3,6 +3,7 @@ package com
 import com.database.tokens.Tokens
 import com.features.callTasks.configureCallTasksRouting
 import com.features.login.configureLoginRouting
+import com.features.messageTemplates.configureMessageTemplatesRouting
 import com.features.register.RegisterController
 import com.plugins.*
 import com.utils.DataError
@@ -73,5 +74,6 @@ suspend fun main() {
 fun Application.module() {
     configureLoginRouting()
     configureCallTasksRouting()
+    configureMessageTemplatesRouting()
     configureSerialization()
 }

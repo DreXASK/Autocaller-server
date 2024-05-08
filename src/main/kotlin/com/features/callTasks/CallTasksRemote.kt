@@ -10,7 +10,7 @@ data class GetCallTasksReceiveRemote(
 )
 
 @Serializable
-data class RemoveCallTasksReceiveRemote(
+data class RemoveCallTaskReceiveRemote(
     val token: String,
     val id: Long
 )
