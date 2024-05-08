@@ -10,18 +10,18 @@ import org.jetbrains.exposed.sql.javatime.timestampWithTimeZone
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object CompletedTasks: LongIdTable("completed_task") {
+object CompletedTasks: LongIdTable("completed_tasks") {
 
     private val surname = varchar("surname", 50).nullable()
     private val name = varchar("name", 50).nullable()
     private val patronymic = varchar("patronymic", 50).nullable()
-    private val phoneNumber = varchar("phone_number", 50)
+    private val phoneNumber = varchar("phone_number", 15)
     private val messageText = varchar("message_text", 500)
     private val callAttempts = integer("call_attempts")
-    private val nextCallDateAndTimeUTC = timestampWithTimeZone("next_call_date_and_time_utc")
+    private val isSmsUsed = bool("is_sms_used")
+    private val informTime = timestampWithTimeZone("inform_time")
 
-
-    fun insert(completedTaskDto: CompletedTaskDto): Result<Unit, DataError.CallTaskError.Insert> {
+    fun insert(completedTaskDto: CompletedTaskDto): Result<Unit, DataError.CompletedTasksError.Insert> {
         return try {
             transaction {
                 CompletedTasks.insert {
@@ -31,58 +31,39 @@ object CompletedTasks: LongIdTable("completed_task") {
                     it[phoneNumber] = completedTaskDto.phoneNumber
                     it[messageText] = completedTaskDto.messageText
                     it[callAttempts] = completedTaskDto.callAttempts
-                    it[nextCallDateAndTimeUTC] = completedTaskDto.nextCallDateAndTimeUTC
+                    it[isSmsUsed] = completedTaskDto.isSmsUsed
+                    it[informTime] = completedTaskDto.informTime
                 }
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(DataError.CallTaskError.Insert.UnknownError(e))
+            Result.Error(DataError.CompletedTasksError.Insert.UnknownError(e))
         }
     }
 
-    fun insert(completedTaskDtoList: List<CompletedTaskDto>): Result<Unit, DataError.CallTaskError.Insert> {
+    fun insert(completedTaskDtoList: List<CompletedTaskDto>): Result<Unit, DataError.CompletedTasksError.Insert> {
         return try {
             transaction {
-                completedTaskDtoList.map { callTaskDto ->
+                completedTaskDtoList.map { completedTaskDto ->
                     CompletedTasks.insert {
-                        it[surname] = callTaskDto.surname
-                        it[name] = callTaskDto.name
-                        it[patronymic] = callTaskDto.patronymic
-                        it[phoneNumber] = callTaskDto.phoneNumber
-                        it[messageText] = callTaskDto.messageText
-                        it[callAttempts] = callTaskDto.callAttempts
-                        it[nextCallDateAndTimeUTC] = callTaskDto.nextCallDateAndTimeUTC
+                        it[surname] = completedTaskDto.surname
+                        it[name] = completedTaskDto.name
+                        it[patronymic] = completedTaskDto.patronymic
+                        it[phoneNumber] = completedTaskDto.phoneNumber
+                        it[messageText] = completedTaskDto.messageText
+                        it[callAttempts] = completedTaskDto.callAttempts
+                        it[isSmsUsed] = completedTaskDto.isSmsUsed
+                        it[informTime] = completedTaskDto.informTime
                     }
                 }
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(DataError.CallTaskError.Insert.UnknownError(e))
+            Result.Error(DataError.CompletedTasksError.Insert.UnknownError(e))
         }
     }
 
-    fun fetch(): Result<CompletedTaskDto, DataError.CallTaskError.Fetch> {
-        return try {
-            transaction {
-                val callTaskModel = CompletedTasks.selectAll().sortedBy { nextCallDateAndTimeUTC }.single()
-                val completedTaskDto = CompletedTaskDto(
-                    id = callTaskModel[CompletedTasks.id].value,
-                    surname = callTaskModel[surname],
-                    name = callTaskModel[name],
-                    patronymic = callTaskModel[patronymic],
-                    phoneNumber = callTaskModel[phoneNumber],
-                    messageText = callTaskModel[messageText],
-                    callAttempts = callTaskModel[callAttempts],
-                    nextCallDateAndTimeUTC = callTaskModel[nextCallDateAndTimeUTC],
-                )
-                Result.Success(completedTaskDto)
-            }
-        } catch (e: NoSuchElementException) {
-            Result.Error(DataError.CallTaskError.Fetch.CallTaskDoesNotExist)
-        }
-    }
-
-    fun fetch(id: Long): Result<CompletedTaskDto, DataError.CallTaskError.Fetch> {
+    fun fetch(id: Long): Result<CompletedTaskDto, DataError.CompletedTasksError.Fetch> {
         return try {
             transaction {
                 val callTaskModel = CompletedTasks.selectAll().where { CompletedTasks.id.eq(id) }.single()
@@ -94,16 +75,17 @@ object CompletedTasks: LongIdTable("completed_task") {
                     phoneNumber = callTaskModel[phoneNumber],
                     messageText = callTaskModel[messageText],
                     callAttempts = callTaskModel[callAttempts],
-                    nextCallDateAndTimeUTC = callTaskModel[nextCallDateAndTimeUTC],
+                    isSmsUsed = callTaskModel[isSmsUsed],
+                    informTime = callTaskModel[informTime]
                 )
                 Result.Success(completedTaskDto)
             }
         } catch (e: NoSuchElementException) {
-            Result.Error(DataError.CallTaskError.Fetch.CallTaskDoesNotExist)
+            Result.Error(DataError.CompletedTasksError.Fetch.CallTasksDoesNotExist)
         }
     }
 
-    fun fetchAll(): Result<List<CompletedTaskDto>, DataError.CallTaskError.Fetch> {
+    fun fetchAll(): Result<List<CompletedTaskDto>, DataError.CompletedTasksError.Fetch> {
         return try {
             transaction {
                 val callTaskList = mutableListOf<CompletedTaskDto>()
@@ -119,7 +101,8 @@ object CompletedTasks: LongIdTable("completed_task") {
                             phoneNumber = it[phoneNumber],
                             messageText = it[messageText],
                             callAttempts = it[callAttempts],
-                            nextCallDateAndTimeUTC = it[nextCallDateAndTimeUTC],
+                            isSmsUsed = it[isSmsUsed],
+                            informTime = it[informTime]
                         )
                     )
                 }
@@ -127,18 +110,18 @@ object CompletedTasks: LongIdTable("completed_task") {
                 Result.Success(callTaskList)
             }
         } catch (e: NoSuchElementException) {
-            Result.Error(DataError.CallTaskError.Fetch.CallTaskDoesNotExist)
+            Result.Error(DataError.CompletedTasksError.Fetch.CallTasksDoesNotExist)
         }
     }
 
-    fun remove(id: Long): Result<Unit, DataError.CallTaskError.Remove> {
+    fun remove(id: Long): Result<Unit, DataError.CallTasksError.Remove> {
         return try {
             transaction {
                 CompletedTasks.deleteWhere { CompletedTasks.id.eq(id) }
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(DataError.CallTaskError.Remove.UnknownError(e))
+            Result.Error(DataError.CallTasksError.Remove.UnknownError(e))
         }
     }
 

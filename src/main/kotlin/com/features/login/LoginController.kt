@@ -19,7 +19,7 @@ class LoginController(private val call: ApplicationCall) {
             is Result.Success -> call.respond(LoginResponseRemote(TokenStatus.REGISTERED))
             is Result.Error -> {
                 when (result.error) {
-                    DataError.TokenError.TokenDoesNotExist -> {
+                    DataError.TokensError.TokensDoesNotExist -> {
                         call.respond(HttpStatusCode.BadRequest, ApiError.TokenStatusError.INVALID_TOKEN)
                     }
                 }

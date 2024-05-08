@@ -8,14 +8,14 @@ import java.util.UUID
 
 object RegisterController {
 
-    fun performRegister(): Result<String, DataError.TokenError.TokenCreationError> {
+    fun performRegister(): Result<String, DataError.TokensError.TokensCreationError> {
         return try {
             val token = UUID.randomUUID().toString()
             val tokenDTO = TokenDto(token)
             Tokens.insert(tokenDTO)
             Result.Success(token)
         } catch (e: Exception) {
-            Result.Error(DataError.TokenError.TokenCreationError(e))
+            Result.Error(DataError.TokensError.TokensCreationError(e))
         }
     }
 

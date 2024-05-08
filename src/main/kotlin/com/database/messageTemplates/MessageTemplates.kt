@@ -21,7 +21,7 @@ object MessageTemplates: LongIdTable("message_templates") {
     private val isAgePlaceholderUsed = bool("is_age_placeholder_used")
 
 
-    fun insert(messageTemplate: MessageTemplateDto): Result<Unit, DataError.MessageTemplateError.Insert> {
+    fun insert(messageTemplate: MessageTemplateDto): Result<Unit, DataError.MessageTemplatesError.Insert> {
         return try {
             transaction {
                 MessageTemplates.insert {
@@ -37,12 +37,12 @@ object MessageTemplates: LongIdTable("message_templates") {
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(DataError.MessageTemplateError.Insert.UnknownError(e))
+            Result.Error(DataError.MessageTemplatesError.Insert.UnknownError(e))
         }
     }
 
 
-    fun fetch(id: Long): Result<MessageTemplateDto, DataError.MessageTemplateError.Fetch> {
+    fun fetch(id: Long): Result<MessageTemplateDto, DataError.MessageTemplatesError.Fetch> {
         return try {
             transaction {
                 val messageTemplateModel = MessageTemplates.selectAll().where { MessageTemplates.id.eq(id) }.single()
@@ -62,11 +62,11 @@ object MessageTemplates: LongIdTable("message_templates") {
                 Result.Success(messageTemplateDto)
             }
         } catch (e: NoSuchElementException) {
-            Result.Error(DataError.MessageTemplateError.Fetch.MessageTemplateDoesNotExist)
+            Result.Error(DataError.MessageTemplatesError.Fetch.MessageTemplatesDoesNotExist)
         }
     }
 
-    fun fetchAll(): Result<List<MessageTemplateDto>, DataError.MessageTemplateError.Fetch> {
+    fun fetchAll(): Result<List<MessageTemplateDto>, DataError.MessageTemplatesError.Fetch> {
         return try {
             transaction {
                 val messageTemplateList = mutableListOf<MessageTemplateDto>()
@@ -93,18 +93,18 @@ object MessageTemplates: LongIdTable("message_templates") {
                 Result.Success(messageTemplateList)
             }
         } catch (e: NoSuchElementException) {
-            Result.Error(DataError.MessageTemplateError.Fetch.MessageTemplateDoesNotExist)
+            Result.Error(DataError.MessageTemplatesError.Fetch.MessageTemplatesDoesNotExist)
         }
     }
 
-    fun remove(id: Long): Result<Unit, DataError.MessageTemplateError.Remove> {
+    fun remove(id: Long): Result<Unit, DataError.MessageTemplatesError.Remove> {
         return try {
             transaction {
                 MessageTemplates.deleteWhere { MessageTemplates.id.eq(id) }
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(DataError.MessageTemplateError.Remove.UnknownError(e))
+            Result.Error(DataError.MessageTemplatesError.Remove.UnknownError(e))
         }
     }
 

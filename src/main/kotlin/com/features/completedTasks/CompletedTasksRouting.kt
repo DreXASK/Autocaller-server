@@ -5,17 +5,13 @@ import io.ktor.server.routing.*
 
 fun Application.configureCompletedTasksRouting() {
     routing {
-        get("/get_tasks_from_server") {
+        get("/get_completed_tasks_from_server") {
             val completedTasksController = CompletedTasksController(call)
             completedTasksController.sendCallTasksToClient()
         }
-        post("/send_tasks_to_server"){
+        post("/send_completed_tasks_to_server"){
             val completedTasksController = CompletedTasksController(call)
             completedTasksController.getCallTasksFromClient()
-        }
-        post("/remove_task_from_server"){
-            val completedTasksController = CompletedTasksController(call)
-            completedTasksController.removeCallTask()
         }
     }
 }

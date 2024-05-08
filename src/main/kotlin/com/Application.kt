@@ -2,6 +2,7 @@ package com
 
 import com.database.tokens.Tokens
 import com.features.callTasks.configureCallTasksRouting
+import com.features.completedTasks.configureCompletedTasksRouting
 import com.features.login.configureLoginRouting
 import com.features.messageTemplates.configureMessageTemplatesRouting
 import com.features.register.RegisterController
@@ -48,7 +49,7 @@ suspend fun main() {
                             result.data.forEach(::println)
                         }
                         is Result.Error -> {
-                            if (result.error is DataError.TokenError.TokenDoesNotExist) {
+                            if (result.error is DataError.TokensError.TokensDoesNotExist) {
                                 println("Registration error - ${result.error}")
                             }
                         }
@@ -74,6 +75,7 @@ suspend fun main() {
 fun Application.module() {
     configureLoginRouting()
     configureCallTasksRouting()
+    configureCompletedTasksRouting()
     configureMessageTemplatesRouting()
     configureSerialization()
 }

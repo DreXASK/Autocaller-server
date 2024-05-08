@@ -12,6 +12,16 @@ sealed interface ApiError: Error {
             data class UnknownError(val exception: Exception?): Remote
         }
     }
+    sealed interface MessageTemplatesError: ApiError {
+        sealed interface Remote: MessageTemplatesError {
+            data class UnknownError(val exception: Exception?): Remote
+        }
+    }
+    sealed interface CompletedTasksError: ApiError {
+        sealed interface Remote: CompletedTasksError {
+            data class UnknownError(val exception: Exception?): Remote
+        }
+    }
     enum class Network: ApiError {
         CONNECTION_REFUSED,
         REQUEST_TIMEOUT

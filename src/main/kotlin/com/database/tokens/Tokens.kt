@@ -19,7 +19,7 @@ object Tokens : Table() {
         }
     }
 
-    fun fetch(token: String): Result<TokenDto, DataError.TokenError.TokenDoesNotExist> {
+    fun fetch(token: String): Result<TokenDto, DataError.TokensError.TokensDoesNotExist> {
         return try {
             transaction{
                 val tokenModel = Tokens.selectAll().where { Tokens.token.eq(token) }.single()
@@ -29,11 +29,11 @@ object Tokens : Table() {
                 Result.Success(tokenDTO)
             }
         } catch (e: NoSuchElementException) {
-            Result.Error(DataError.TokenError.TokenDoesNotExist)
+            Result.Error(DataError.TokensError.TokensDoesNotExist)
         }
     }
 
-    fun fetchAll(): Result<List<TokenDto>, DataError.TokenError> {
+    fun fetchAll(): Result<List<TokenDto>, DataError.TokensError> {
         return try {
             transaction {
                 val tokenDtoList = mutableListOf<TokenDto>()
@@ -50,7 +50,7 @@ object Tokens : Table() {
                 Result.Success(tokenDtoList)
             }
         } catch (e: NoSuchElementException) {
-            Result.Error(DataError.TokenError.TokenDoesNotExist)
+            Result.Error(DataError.TokensError.TokensDoesNotExist)
         }
     }
 }

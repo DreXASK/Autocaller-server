@@ -22,7 +22,7 @@ class CallTasksController(private val call: ApplicationCall) {
             is Result.Success -> call.respond(HttpStatusCode.OK)
             is Result.Error -> {
                 when (result.error) {
-                    is DataError.CallTaskError.Insert.UnknownError ->
+                    is DataError.CallTasksError.Insert.UnknownError ->
                         call.respond(
                             HttpStatusCode.BadRequest,
                             ApiError.CallTasksError.Remote.UnknownError(result.error.e)
@@ -41,7 +41,7 @@ class CallTasksController(private val call: ApplicationCall) {
             is Result.Success -> call.respond(result.data)
             is Result.Error -> {
                 when (result.error) {
-                    is DataError.CallTaskError.Fetch.CallTaskDoesNotExist ->
+                    is DataError.CallTasksError.Fetch.CallTasksDoesNotExist ->
                         call.respond(HttpStatusCode.BadRequest, ApiError.CallTasksError.Remote.UnknownError(null))
                 }
             }
@@ -57,7 +57,7 @@ class CallTasksController(private val call: ApplicationCall) {
             is Result.Success -> call.respond(HttpStatusCode.OK)
             is Result.Error -> {
                 when (result.error) {
-                    is DataError.CallTaskError.Remove.UnknownError -> call.respond(
+                    is DataError.CallTasksError.Remove.UnknownError -> call.respond(
                         HttpStatusCode.BadRequest,
                         ApiError.CallTasksError.Remote.UnknownError(result.error.e)
                     )
@@ -69,7 +69,7 @@ class CallTasksController(private val call: ApplicationCall) {
     private suspend fun auth(token: String) {
         when (val result = Tokens.fetch(token)) {
             is Result.Error -> {
-                if (result.error == DataError.TokenError.TokenDoesNotExist)
+                if (result.error == DataError.TokensError.TokensDoesNotExist)
                     call.respond(HttpStatusCode.BadRequest, ApiError.TokenStatusError.INVALID_TOKEN)
             }
 

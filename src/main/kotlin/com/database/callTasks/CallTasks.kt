@@ -15,13 +15,13 @@ object CallTasks: LongIdTable("call_tasks") {
     private val surname = varchar("surname", 50).nullable()
     private val name = varchar("name", 50).nullable()
     private val patronymic = varchar("patronymic", 50).nullable()
-    private val phoneNumber = varchar("phone_number", 50)
+    private val phoneNumber = varchar("phone_number", 15)
     private val messageText = varchar("message_text", 500)
     private val callAttempts = integer("call_attempts")
     private val nextCallDateAndTimeUTC = timestampWithTimeZone("next_call_date_and_time_utc")
 
 
-    fun insert(callTaskDto: CallTaskDto): Result<Unit, DataError.CallTaskError.Insert> {
+    fun insert(callTaskDto: CallTaskDto): Result<Unit, DataError.CallTasksError.Insert> {
         return try {
             transaction {
                 CallTasks.insert {
@@ -36,11 +36,11 @@ object CallTasks: LongIdTable("call_tasks") {
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(DataError.CallTaskError.Insert.UnknownError(e))
+            Result.Error(DataError.CallTasksError.Insert.UnknownError(e))
         }
     }
 
-    fun insert(callTaskDtoList: List<CallTaskDto>): Result<Unit, DataError.CallTaskError.Insert> {
+    fun insert(callTaskDtoList: List<CallTaskDto>): Result<Unit, DataError.CallTasksError.Insert> {
         return try {
             transaction {
                 callTaskDtoList.map { callTaskDto ->
@@ -57,11 +57,11 @@ object CallTasks: LongIdTable("call_tasks") {
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(DataError.CallTaskError.Insert.UnknownError(e))
+            Result.Error(DataError.CallTasksError.Insert.UnknownError(e))
         }
     }
 
-    fun fetch(): Result<CallTaskDto, DataError.CallTaskError.Fetch> {
+    fun fetch(): Result<CallTaskDto, DataError.CallTasksError.Fetch> {
         return try {
             transaction {
                 val callTaskModel = CallTasks.selectAll().sortedBy { nextCallDateAndTimeUTC }.single()
@@ -78,11 +78,11 @@ object CallTasks: LongIdTable("call_tasks") {
                 Result.Success(callTaskDto)
             }
         } catch (e: NoSuchElementException) {
-            Result.Error(DataError.CallTaskError.Fetch.CallTaskDoesNotExist)
+            Result.Error(DataError.CallTasksError.Fetch.CallTasksDoesNotExist)
         }
     }
 
-    fun fetch(id: Long): Result<CallTaskDto, DataError.CallTaskError.Fetch> {
+    fun fetch(id: Long): Result<CallTaskDto, DataError.CallTasksError.Fetch> {
         return try {
             transaction {
                 val callTaskModel = CallTasks.selectAll().where { CallTasks.id.eq(id) }.single()
@@ -99,11 +99,11 @@ object CallTasks: LongIdTable("call_tasks") {
                 Result.Success(callTaskDto)
             }
         } catch (e: NoSuchElementException) {
-            Result.Error(DataError.CallTaskError.Fetch.CallTaskDoesNotExist)
+            Result.Error(DataError.CallTasksError.Fetch.CallTasksDoesNotExist)
         }
     }
 
-    fun fetchAll(): Result<List<CallTaskDto>, DataError.CallTaskError.Fetch> {
+    fun fetchAll(): Result<List<CallTaskDto>, DataError.CallTasksError.Fetch> {
         return try {
             transaction {
                 val callTaskList = mutableListOf<CallTaskDto>()
@@ -127,18 +127,18 @@ object CallTasks: LongIdTable("call_tasks") {
                 Result.Success(callTaskList)
             }
         } catch (e: NoSuchElementException) {
-            Result.Error(DataError.CallTaskError.Fetch.CallTaskDoesNotExist)
+            Result.Error(DataError.CallTasksError.Fetch.CallTasksDoesNotExist)
         }
     }
 
-    fun remove(id: Long): Result<Unit, DataError.CallTaskError.Remove> {
+    fun remove(id: Long): Result<Unit, DataError.CallTasksError.Remove> {
         return try {
             transaction {
                 CallTasks.deleteWhere { CallTasks.id.eq(id) }
             }
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(DataError.CallTaskError.Remove.UnknownError(e))
+            Result.Error(DataError.CallTasksError.Remove.UnknownError(e))
         }
     }
 

@@ -22,10 +22,10 @@ class MessageTemplatesController(private val call: ApplicationCall) {
             is Result.Success -> call.respond(HttpStatusCode.OK)
             is Result.Error -> {
                 when (result.error) {
-                    is DataError.MessageTemplateError.Insert.UnknownError ->
+                    is DataError.MessageTemplatesError.Insert.UnknownError ->
                         call.respond(
                             HttpStatusCode.BadRequest,
-                            ApiError.CallTasksError.Remote.UnknownError(result.error.e)
+                            ApiError.MessageTemplatesError.Remote.UnknownError(result.error.e)
                         )
                 }
             }
@@ -41,8 +41,8 @@ class MessageTemplatesController(private val call: ApplicationCall) {
             is Result.Success -> call.respond(result.data)
             is Result.Error -> {
                 when (result.error) {
-                    is DataError.MessageTemplateError.Fetch.MessageTemplateDoesNotExist ->
-                        call.respond(HttpStatusCode.BadRequest, ApiError.CallTasksError.Remote.UnknownError(null))
+                    is DataError.MessageTemplatesError.Fetch.MessageTemplatesDoesNotExist ->
+                        call.respond(HttpStatusCode.BadRequest, ApiError.MessageTemplatesError.Remote.UnknownError(null))
                 }
             }
         }
@@ -57,9 +57,9 @@ class MessageTemplatesController(private val call: ApplicationCall) {
             is Result.Success -> call.respond(HttpStatusCode.OK)
             is Result.Error -> {
                 when (result.error) {
-                    is DataError.MessageTemplateError.Remove.UnknownError -> call.respond(
+                    is DataError.MessageTemplatesError.Remove.UnknownError -> call.respond(
                         HttpStatusCode.BadRequest,
-                        ApiError.CallTasksError.Remote.UnknownError(result.error.e)
+                        ApiError.MessageTemplatesError.Remote.UnknownError(result.error.e)
                     )
                 }
             }
@@ -69,7 +69,7 @@ class MessageTemplatesController(private val call: ApplicationCall) {
     private suspend fun auth(token: String) {
         when (val result = Tokens.fetch(token)) {
             is Result.Error -> {
-                if (result.error == DataError.TokenError.TokenDoesNotExist)
+                if (result.error == DataError.TokensError.TokensDoesNotExist)
                     call.respond(HttpStatusCode.BadRequest, ApiError.TokenStatusError.INVALID_TOKEN)
             }
 
