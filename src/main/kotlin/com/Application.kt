@@ -1,6 +1,7 @@
 package com
 
 import com.database.tokens.Tokens
+import com.features.callProcessSettings.configureCallProcessSettingsRouting
 import com.features.callTasks.configureCallTasksRouting
 import com.features.completedTasks.configureCompletedTasksRouting
 import com.features.login.configureLoginRouting
@@ -77,5 +78,6 @@ fun Application.module() {
     configureCallTasksRouting()
     configureCompletedTasksRouting()
     configureMessageTemplatesRouting()
+    configureCallProcessSettingsRouting()
     configureSerialization()
 }

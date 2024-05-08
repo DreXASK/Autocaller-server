@@ -2,7 +2,6 @@ package com.features.callTasks
 
 import com.database.callTasks.CallTasks
 import com.database.tokens.Tokens
-import com.utils.ApiError
 import com.utils.DataError
 import com.utils.Result
 import io.ktor.http.*
@@ -25,7 +24,7 @@ class CallTasksController(private val call: ApplicationCall) {
                     is DataError.CallTasksError.Insert.UnknownError ->
                         call.respond(
                             HttpStatusCode.BadRequest,
-                            ApiError.CallTasksError.Remote.UnknownError(result.error.e)
+                            result.error.e.message.toString()
                         )
                 }
             }
@@ -42,7 +41,7 @@ class CallTasksController(private val call: ApplicationCall) {
             is Result.Error -> {
                 when (result.error) {
                     is DataError.CallTasksError.Fetch.CallTasksDoesNotExist ->
-                        call.respond(HttpStatusCode.BadRequest, ApiError.CallTasksError.Remote.UnknownError(null))
+                        call.respond(HttpStatusCode.BadRequest, "CallTasksTable is empty")
                 }
             }
         }
@@ -59,7 +58,7 @@ class CallTasksController(private val call: ApplicationCall) {
                 when (result.error) {
                     is DataError.CallTasksError.Remove.UnknownError -> call.respond(
                         HttpStatusCode.BadRequest,
-                        ApiError.CallTasksError.Remote.UnknownError(result.error.e)
+                        result.error.e.message.toString()
                     )
                 }
             }
@@ -70,7 +69,7 @@ class CallTasksController(private val call: ApplicationCall) {
         when (val result = Tokens.fetch(token)) {
             is Result.Error -> {
                 if (result.error == DataError.TokensError.TokensDoesNotExist)
-                    call.respond(HttpStatusCode.BadRequest, ApiError.TokenStatusError.INVALID_TOKEN)
+                    call.respond(HttpStatusCode.BadRequest, "Invalid token")
             }
 
             is Result.Success -> Unit

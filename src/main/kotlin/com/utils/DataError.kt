@@ -35,4 +35,13 @@ sealed interface DataError: Error {
             data class UnknownError(val e: Exception): Remove
         }
     }
+    sealed interface CallProcessSettingsError: DataError {
+        sealed interface WriteToFile: CallProcessSettingsError {
+            data class UnknownError(val e: Exception): WriteToFile
+        }
+        sealed interface FetchFromFile: CallProcessSettingsError {
+            data object FileNotFound: FetchFromFile
+            data class UnknownError(val e: Exception) : FetchFromFile
+        }
+    }
 }

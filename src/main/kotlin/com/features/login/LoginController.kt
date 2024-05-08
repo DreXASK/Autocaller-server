@@ -1,7 +1,6 @@
 package com.features.login
 
 import com.database.tokens.Tokens
-import com.utils.ApiError
 import com.utils.DataError
 import com.utils.Result
 import com.utils.TokenStatus
@@ -20,7 +19,7 @@ class LoginController(private val call: ApplicationCall) {
             is Result.Error -> {
                 when (result.error) {
                     DataError.TokensError.TokensDoesNotExist -> {
-                        call.respond(HttpStatusCode.BadRequest, ApiError.TokenStatusError.INVALID_TOKEN)
+                        call.respond(HttpStatusCode.BadRequest, "Invalid token")
                     }
                 }
             }

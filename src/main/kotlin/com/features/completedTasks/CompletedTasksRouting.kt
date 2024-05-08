@@ -7,11 +7,11 @@ fun Application.configureCompletedTasksRouting() {
     routing {
         get("/get_completed_tasks_from_server") {
             val completedTasksController = CompletedTasksController(call)
-            completedTasksController.sendCallTasksToClient()
+            completedTasksController.sendCompletedTasksToClient()
         }
         post("/send_completed_tasks_to_server"){
             val completedTasksController = CompletedTasksController(call)
-            completedTasksController.getCallTasksFromClient()
+            completedTasksController.getCompletedTasksFromClient()
         }
     }
 }
