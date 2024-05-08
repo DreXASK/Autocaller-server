@@ -11,7 +11,7 @@ object RegisterController {
     fun performRegister(): Result<String, DataError.TokenError.TokenCreationError> {
         return try {
             val token = UUID.randomUUID().toString()
-            val tokenDTO = TokenDto(autoIncId = null, token = token)
+            val tokenDTO = TokenDto(token)
             Tokens.insert(tokenDTO)
             Result.Success(token)
         } catch (e: Exception) {

@@ -2,15 +2,12 @@ package com.database.tokens
 
 import com.utils.DataError
 import com.utils.Result
-import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.autoIncColumnType
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object Tokens : LongIdTable() {
+object Tokens : Table() {
 
     private val token = varchar("token", 36)
 
@@ -27,7 +24,6 @@ object Tokens : LongIdTable() {
             transaction{
                 val tokenModel = Tokens.selectAll().where { Tokens.token.eq(token) }.single()
                 val tokenDTO = TokenDto(
-                    autoIncId = tokenModel[Tokens.id].value,
                     token = tokenModel[Tokens.token],
                 )
                 Result.Success(tokenDTO)
@@ -46,7 +42,6 @@ object Tokens : LongIdTable() {
                 tokenModel.map {
                     tokenDtoList.add(
                         TokenDto(
-                            autoIncId = it[Tokens.id].value,
                             token = it[token],
                         )
                     )

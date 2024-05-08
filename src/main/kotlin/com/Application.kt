@@ -1,6 +1,7 @@
 package com
 
 import com.database.tokens.Tokens
+import com.features.callTasks.configureCallTasksRouting
 import com.features.login.configureLoginRouting
 import com.features.register.RegisterController
 import com.plugins.*
@@ -9,15 +10,11 @@ import com.utils.Result
 
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
-import io.ktor.server.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.Database
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
+import java.time.*
 
 
 suspend fun main() {
@@ -57,8 +54,8 @@ suspend fun main() {
                     }
                 }
                 "haha" -> {
-                    val a = ZonedDateTime.now(ZoneOffset.UTC)
-                    val b = a.withZoneSameInstant(ZoneId.systemDefault())
+                    val a = OffsetDateTime.now(ZoneOffset.UTC)
+                    val b = a.withOffsetSameInstant(ZoneId.systemDefault().rules.getOffset(Instant.now()))
                     println(a)
                     println(b)
                 }
@@ -75,5 +72,6 @@ suspend fun main() {
 
 fun Application.module() {
     configureLoginRouting()
+    configureCallTasksRouting()
     configureSerialization()
 }

@@ -1,26 +1,21 @@
 package com.features.callTasks
 
+import com.database.callTasks.CallTaskDto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CallTasksReceiveRemote(
+data class GetCallTasksReceiveRemote(
     val token: String,
-    val list: List<CallTaskDataFromJson>
+    val list: List<CallTaskDto>
 )
 
-//@Serializable
-//data class CallTasksResponseRemote(
-//    val tokenStatus: TokenStatus
-//)
-
+@Serializable
+data class RemoveCallTasksReceiveRemote(
+    val token: String,
+    val id: Long
+)
 
 @Serializable
-data class CallTaskDataFromJson(
-    val surname: String?,
-    val name: String?,
-    val patronymic: String?,
-    val phoneNumber: String,
-    val messageText: String,
-    val callAttempts: Int,
-    val nextCallDateAndTimeUTC: String
+data class SendCallTasksReceiveRemote(
+    val token: String
 )
