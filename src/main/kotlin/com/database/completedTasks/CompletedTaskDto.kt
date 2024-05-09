@@ -14,5 +14,5 @@ data class CompletedTaskDto(
     val messageText: String,
     val callAttempts: Int,
     val isSmsUsed: Boolean,
-    @Serializable(with = OffsetDateTimeSerializer::class) val informTime: OffsetDateTime
+    @Serializable(with = OffsetDateTimeSerializer::class) val informDateTime: OffsetDateTime
 )

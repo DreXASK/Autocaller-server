@@ -19,7 +19,7 @@ object CompletedTasks: LongIdTable("completed_tasks") {
     private val messageText = varchar("message_text", 500)
     private val callAttempts = integer("call_attempts")
     private val isSmsUsed = bool("is_sms_used")
-    private val informTime = timestampWithTimeZone("inform_time")
+    private val informDateTime = timestampWithTimeZone("inform_date_time")
 
     fun insert(completedTaskDto: CompletedTaskDto): Result<Unit, DataError.CompletedTasksError.Insert> {
         return try {
@@ -32,7 +32,7 @@ object CompletedTasks: LongIdTable("completed_tasks") {
                     it[messageText] = completedTaskDto.messageText
                     it[callAttempts] = completedTaskDto.callAttempts
                     it[isSmsUsed] = completedTaskDto.isSmsUsed
-                    it[informTime] = completedTaskDto.informTime
+                    it[informDateTime] = completedTaskDto.informDateTime
                 }
             }
             Result.Success(Unit)
@@ -53,7 +53,7 @@ object CompletedTasks: LongIdTable("completed_tasks") {
                         it[messageText] = completedTaskDto.messageText
                         it[callAttempts] = completedTaskDto.callAttempts
                         it[isSmsUsed] = completedTaskDto.isSmsUsed
-                        it[informTime] = completedTaskDto.informTime
+                        it[informDateTime] = completedTaskDto.informDateTime
                     }
                 }
             }
@@ -76,7 +76,7 @@ object CompletedTasks: LongIdTable("completed_tasks") {
                     messageText = callTaskModel[messageText],
                     callAttempts = callTaskModel[callAttempts],
                     isSmsUsed = callTaskModel[isSmsUsed],
-                    informTime = callTaskModel[informTime]
+                    informDateTime = callTaskModel[informDateTime]
                 )
                 Result.Success(completedTaskDto)
             }
@@ -102,7 +102,7 @@ object CompletedTasks: LongIdTable("completed_tasks") {
                             messageText = it[messageText],
                             callAttempts = it[callAttempts],
                             isSmsUsed = it[isSmsUsed],
-                            informTime = it[informTime]
+                            informDateTime = it[informDateTime]
                         )
                     )
                 }

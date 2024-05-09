@@ -1,5 +1,7 @@
 package com
 
+import com.database.completedTasks.CompletedTaskDto
+import com.database.completedTasks.CompletedTasks
 import com.database.tokens.Tokens
 import com.features.callProcessSettings.configureCallProcessSettingsRouting
 import com.features.callTasks.configureCallTasksRouting
@@ -18,6 +20,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.Database
 import java.time.*
+import kotlin.random.Random.Default.nextBoolean
+import kotlin.random.Random.Default.nextInt
+import kotlin.random.Random.Default.nextLong
 
 
 suspend fun main() {
@@ -57,10 +62,30 @@ suspend fun main() {
                     }
                 }
                 "haha" -> {
-                    val a = OffsetDateTime.now(ZoneOffset.UTC)
-                    val b = a.withOffsetSameInstant(ZoneId.systemDefault().rules.getOffset(Instant.now()))
-                    println(a)
-                    println(b)
+//                    val a = OffsetDateTime.now(ZoneOffset.UTC)
+//                    val b = a.withOffsetSameInstant(ZoneId.systemDefault().rules.getOffset(Instant.now()))
+                    val list = mutableListOf<CompletedTaskDto>()
+
+                    repeat(50) {
+                        val callAttempts = nextInt(1,4)
+                        val informDateTime = OffsetDateTime.now(ZoneOffset.UTC).minusDays(nextLong(10)).minusHours(nextLong(24))
+
+                        list.add(
+                            CompletedTaskDto(
+                                id = null,
+                                surname = "SurnameTest",
+                                name = "NameTest",
+                                patronymic = "PatronymicTest",
+                                phoneNumber = "88005553535",
+                                messageText = "Test message text)))))))))))",
+                                callAttempts = callAttempts,
+                                isSmsUsed = if(callAttempts == 3) nextBoolean() else false,
+                                informDateTime = informDateTime
+                            )
+                        )
+                    }
+
+                    CompletedTasks.insert(list)
                 }
                 "lol" -> println("lol)")
                 "close" -> server?.stop()
