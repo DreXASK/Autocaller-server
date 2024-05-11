@@ -1,6 +1,7 @@
 package com.features.callerDevice
 
 import com.database.callProcessSettings.CallProcessSettings
+import com.database.callTasks.CallTaskForDeviceDto
 import com.database.callTasks.CallTasks
 import com.database.callTasksInWork.CallTaskInWorkDto
 import com.database.callTasksInWork.CallTasksInWork
@@ -27,18 +28,35 @@ class CallerDeviceController(private val call: ApplicationCall) {
             return
         }
 
-        val oldestTaskResult = CallTasks.fetch25Oldest()
+        val settingsFetchResult = CallProcessSettings.fetchFromFile()
+        if (settingsFetchResult is Result.Error) {
+            throw Exception("getResultFromCallerDevice error - ${settingsFetchResult.error}")
+        }
+
+        val currentDateTimeUTC = OffsetDateTime.now(ZoneOffset.UTC)
+        val currentTimeUTC = currentDateTimeUTC.toOffsetTime()
+        if (currentTimeUTC < (settingsFetchResult as Result.Success).data.timeFrom
+            || currentTimeUTC > settingsFetchResult.data.timeTo
+        ) {
+            call.respond(HttpStatusCode.BadRequest, "Outside the call process execution interval")
+            return
+        }
+
+        val oldestTaskResult = CallTasks.fetchOldestCallTasksList(25)
+
         if (oldestTaskResult is Result.Error) {
             call.respond(HttpStatusCode.NoContent)
             return
         }
 
-
         (oldestTaskResult as Result.Success).data.map {
             if (it.id == null)
                 throw Exception("id == null")
 
-            println(it.id)
+            if (currentDateTimeUTC < it.nextCallDateTimeUTC) {
+                call.respond(HttpStatusCode.NoContent)
+                return
+            }
 
             when (val inWorkFetchResult = CallTasksInWork.fetch(it.id)) {
                 is Result.Success -> {
@@ -53,7 +71,15 @@ class CallerDeviceController(private val call: ApplicationCall) {
                             )
                         )
                     )
-                    call.respond(it)
+
+                    val callTaskForDeviceDto = CallTaskForDeviceDto(
+                        id = it.id,
+                        phoneNumber = it.phoneNumber,
+                        messageText = it.messageText,
+                        callAttempts = it.callAttempts
+                    )
+
+                    call.respond(callTaskForDeviceDto)
                     return
                 }
 
@@ -64,13 +90,21 @@ class CallerDeviceController(private val call: ApplicationCall) {
                             dateTimeOfFetchUTC = OffsetDateTime.now(ZoneOffset.UTC)
                         )
                     )
-                    call.respond(it)
+
+                    val callTaskForDeviceDto = CallTaskForDeviceDto(
+                        id = it.id,
+                        phoneNumber = it.phoneNumber,
+                        messageText = it.messageText,
+                        callAttempts = it.callAttempts
+                    )
+
+                    call.respond(callTaskForDeviceDto)
                     return
                 }
             }
         }
 
-        call.respond(HttpStatusCode.InternalServerError)
+        call.respond(HttpStatusCode.NoContent)
     }
 
     suspend fun getResultFromCallerDevice() {
@@ -78,17 +112,13 @@ class CallerDeviceController(private val call: ApplicationCall) {
 
         auth(receive.token, call)
 
-        val callTaskFetchResult = CallTasks.fetch(receive.id)
+        val callTaskFetchResult = CallTasks.fetch(receive.callTaskId)
         if (callTaskFetchResult is Result.Error)
             throw Exception("getResultFromCallerDevice error - ${callTaskFetchResult.error}")
 
-        val settingsFetchResult = CallProcessSettings.fetchFromFile()
-        if (settingsFetchResult is Result.Error)
-            throw Exception("getResultFromCallerDevice error - ${settingsFetchResult.error}")
 
         if ((callTaskFetchResult as Result.Success).data.id == null)
             throw Exception("getResultFromCallerDevice error - CallTask's id is null")
-
 
         if (receive.isSuccess) {
             transaction {
@@ -103,7 +133,7 @@ class CallerDeviceController(private val call: ApplicationCall) {
                         phoneNumber = callTaskFetchResult.data.phoneNumber,
                         messageText = callTaskFetchResult.data.messageText,
                         callAttempts = callTaskFetchResult.data.callAttempts + 1,
-                        informDateTime = OffsetDateTime.now(ZoneOffset.UTC),
+                        informDateTimeUTC = OffsetDateTime.now(ZoneOffset.UTC),
                         isSmsUsed = false
                     )
                 )
@@ -122,7 +152,7 @@ class CallerDeviceController(private val call: ApplicationCall) {
                             phoneNumber = callTaskFetchResult.data.phoneNumber,
                             messageText = callTaskFetchResult.data.messageText,
                             callAttempts = callTaskFetchResult.data.callAttempts + 1,
-                            informDateTime = OffsetDateTime.now(ZoneOffset.UTC),
+                            informDateTimeUTC = OffsetDateTime.now(ZoneOffset.UTC),
                             isSmsUsed = true
                         )
                     )

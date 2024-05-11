@@ -71,6 +71,7 @@ class CallTasksController(private val call: ApplicationCall) {
                 CallTasksInWork.remove(inWorkFetchResult.data.id)
             } else {
                 call.respond(HttpStatusCode.BadRequest, "The CallTask is currently in an executing state")
+                return
             }
         }
 

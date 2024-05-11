@@ -32,7 +32,7 @@ object CompletedTasks: LongIdTable("completed_tasks") {
                     it[messageText] = completedTaskDto.messageText
                     it[callAttempts] = completedTaskDto.callAttempts
                     it[isSmsUsed] = completedTaskDto.isSmsUsed
-                    it[informDateTime] = completedTaskDto.informDateTime
+                    it[informDateTime] = completedTaskDto.informDateTimeUTC
                 }
             }
             Result.Success(Unit)
@@ -53,7 +53,7 @@ object CompletedTasks: LongIdTable("completed_tasks") {
                         it[messageText] = completedTaskDto.messageText
                         it[callAttempts] = completedTaskDto.callAttempts
                         it[isSmsUsed] = completedTaskDto.isSmsUsed
-                        it[informDateTime] = completedTaskDto.informDateTime
+                        it[informDateTime] = completedTaskDto.informDateTimeUTC
                     }
                 }
             }
@@ -76,7 +76,7 @@ object CompletedTasks: LongIdTable("completed_tasks") {
                     messageText = callTaskModel[messageText],
                     callAttempts = callTaskModel[callAttempts],
                     isSmsUsed = callTaskModel[isSmsUsed],
-                    informDateTime = callTaskModel[informDateTime]
+                    informDateTimeUTC = callTaskModel[informDateTime]
                 )
                 Result.Success(completedTaskDto)
             }
@@ -102,7 +102,7 @@ object CompletedTasks: LongIdTable("completed_tasks") {
                             messageText = it[messageText],
                             callAttempts = it[callAttempts],
                             isSmsUsed = it[isSmsUsed],
-                            informDateTime = it[informDateTime]
+                            informDateTimeUTC = it[informDateTime]
                         )
                     )
                 }

@@ -81,14 +81,17 @@ suspend fun main() {
                                 messageText = "Test message text)))))))))))",
                                 callAttempts = callAttempts,
                                 isSmsUsed = if(callAttempts == 3) nextBoolean() else false,
-                                informDateTime = informDateTime
+                                informDateTimeUTC = informDateTime
                             )
                         )
                     }
 
                     CompletedTasks.insert(list)
                 }
-                "lol" -> println("lol)")
+                "timeUtc" -> {
+                    println(OffsetTime.now(ZoneOffset.UTC))
+                    println(OffsetDateTime.now(ZoneOffset.UTC).plusHours(6))
+                }
                 "close" -> server?.stop()
                 else -> println("Command has not been recognized")
             }

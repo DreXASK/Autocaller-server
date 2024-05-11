@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
-object CallTasks: LongIdTable("call_tasks") {
+object CallTasks : LongIdTable("call_tasks") {
 
     private val surname = varchar("surname", 50).nullable()
     private val name = varchar("name", 50).nullable()
@@ -62,11 +62,11 @@ object CallTasks: LongIdTable("call_tasks") {
         }
     }
 
-    fun fetch25Oldest(): Result<List<CallTaskDto>, DataError.CallTasksError.Fetch> {
+    fun fetchOldestCallTasksList(takeNumber: Int): Result<List<CallTaskDto>, DataError.CallTasksError.Fetch> {
         return try {
             val callTaskList = mutableListOf<CallTaskDto>()
             transaction {
-                val callTaskModel = CallTasks.selectAll().sortedBy { nextCallDateTimeUTC }.take(25)
+                val callTaskModel = CallTasks.selectAll().sortedBy { nextCallDateTimeUTC }.take(takeNumber)
 
                 callTaskModel.map {
                     callTaskList.add(
