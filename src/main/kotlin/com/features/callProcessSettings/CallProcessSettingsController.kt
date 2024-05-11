@@ -2,6 +2,7 @@ package com.features.callProcessSettings
 
 import com.database.callProcessSettings.CallProcessSettings
 import com.database.tokens.Tokens
+import com.features.auth
 import com.utils.DataError
 import com.utils.Result
 import io.ktor.http.*
@@ -14,7 +15,9 @@ class CallProcessSettingsController(private val call: ApplicationCall) {
     suspend fun getCallProcessSettingsFromClient() {
         val receive = call.receive<GetCallProcessSettingsReceiveRemote>()
 
-        auth(receive.token)
+        if (!auth(receive.token, call)) {
+            return
+        }
 
         val settingsDto = receive.settings
         when (val result = CallProcessSettings.writeToFile(settingsDto)) {
@@ -34,7 +37,9 @@ class CallProcessSettingsController(private val call: ApplicationCall) {
     suspend fun sendCallProcessSettingsToClient() {
         val receive = call.receive<SendCallProcessSettingsReceiveRemote>()
 
-        auth(receive.token)
+        if (!auth(receive.token, call)) {
+            return
+        }
 
         when (val result = CallProcessSettings.fetchFromFile()) {
             is Result.Success -> call.respond(result.data)
@@ -54,14 +59,4 @@ class CallProcessSettingsController(private val call: ApplicationCall) {
         }
     }
 
-
-    private suspend fun auth(token: String) {
-        when (val result = Tokens.fetch(token)) {
-            is Result.Error -> {
-                if (result.error == DataError.TokensError.TokensDoesNotExist)
-                    call.respond(HttpStatusCode.BadRequest, "Invalid token")
-            }
-            is Result.Success -> Unit
-        }
-    }
 }

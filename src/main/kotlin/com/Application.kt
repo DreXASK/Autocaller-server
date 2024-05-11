@@ -5,6 +5,7 @@ import com.database.completedTasks.CompletedTasks
 import com.database.tokens.Tokens
 import com.features.callProcessSettings.configureCallProcessSettingsRouting
 import com.features.callTasks.configureCallTasksRouting
+import com.features.callerDevice.configureCallerDeviceRouting
 import com.features.completedTasks.configureCompletedTasksRouting
 import com.features.login.configureLoginRouting
 import com.features.messageTemplates.configureMessageTemplatesRouting
@@ -100,6 +101,7 @@ suspend fun main() {
 
 fun Application.module() {
     configureLoginRouting()
+    configureCallerDeviceRouting()
     configureCallTasksRouting()
     configureCompletedTasksRouting()
     configureMessageTemplatesRouting()

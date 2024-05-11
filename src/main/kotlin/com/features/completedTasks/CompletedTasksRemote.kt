@@ -1,6 +1,5 @@
 package com.features.completedTasks
 
-import com.database.callTasks.CallTaskDto
 import com.database.completedTasks.CompletedTaskDto
 import kotlinx.serialization.Serializable
 
@@ -12,6 +11,6 @@ data class SendCompletedTasksReceiveRemote(
 @Serializable
 data class GetCompletedTasksReceiveRemote(
     val token: String,
-    val list: List<CompletedTaskDto>
+    val completedTaskDto: CompletedTaskDto
 )
 

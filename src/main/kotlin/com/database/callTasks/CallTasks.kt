@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.timestampWithTimeZone
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 
 object CallTasks: LongIdTable("call_tasks") {
 
@@ -18,7 +19,7 @@ object CallTasks: LongIdTable("call_tasks") {
     private val phoneNumber = varchar("phone_number", 15)
     private val messageText = varchar("message_text", 500)
     private val callAttempts = integer("call_attempts")
-    private val nextCallDateAndTimeUTC = timestampWithTimeZone("next_call_date_and_time_utc")
+    private val nextCallDateTimeUTC = timestampWithTimeZone("next_call_date_time_utc")
 
 
     fun insert(callTaskDto: CallTaskDto): Result<Unit, DataError.CallTasksError.Insert> {
@@ -31,7 +32,7 @@ object CallTasks: LongIdTable("call_tasks") {
                     it[phoneNumber] = callTaskDto.phoneNumber
                     it[messageText] = callTaskDto.messageText
                     it[callAttempts] = callTaskDto.callAttempts
-                    it[nextCallDateAndTimeUTC] = callTaskDto.nextCallDateAndTimeUTC
+                    it[nextCallDateTimeUTC] = callTaskDto.nextCallDateTimeUTC
                 }
             }
             Result.Success(Unit)
@@ -51,7 +52,7 @@ object CallTasks: LongIdTable("call_tasks") {
                         it[phoneNumber] = callTaskDto.phoneNumber
                         it[messageText] = callTaskDto.messageText
                         it[callAttempts] = callTaskDto.callAttempts
-                        it[nextCallDateAndTimeUTC] = callTaskDto.nextCallDateAndTimeUTC
+                        it[nextCallDateTimeUTC] = callTaskDto.nextCallDateTimeUTC
                     }
                 }
             }
@@ -61,21 +62,28 @@ object CallTasks: LongIdTable("call_tasks") {
         }
     }
 
-    fun fetch(): Result<CallTaskDto, DataError.CallTasksError.Fetch> {
+    fun fetch25Oldest(): Result<List<CallTaskDto>, DataError.CallTasksError.Fetch> {
         return try {
+            val callTaskList = mutableListOf<CallTaskDto>()
             transaction {
-                val callTaskModel = CallTasks.selectAll().sortedBy { nextCallDateAndTimeUTC }.single()
-                val callTaskDto = CallTaskDto(
-                    id = callTaskModel[CallTasks.id].value,
-                    surname = callTaskModel[surname],
-                    name = callTaskModel[name],
-                    patronymic = callTaskModel[patronymic],
-                    phoneNumber = callTaskModel[phoneNumber],
-                    messageText = callTaskModel[messageText],
-                    callAttempts = callTaskModel[callAttempts],
-                    nextCallDateAndTimeUTC = callTaskModel[nextCallDateAndTimeUTC],
-                )
-                Result.Success(callTaskDto)
+                val callTaskModel = CallTasks.selectAll().sortedBy { nextCallDateTimeUTC }.take(25)
+
+                callTaskModel.map {
+                    callTaskList.add(
+                        CallTaskDto(
+                            id = it[CallTasks.id].value,
+                            surname = it[surname],
+                            name = it[name],
+                            patronymic = it[patronymic],
+                            phoneNumber = it[phoneNumber],
+                            messageText = it[messageText],
+                            callAttempts = it[callAttempts],
+                            nextCallDateTimeUTC = it[nextCallDateTimeUTC],
+                        )
+                    )
+                }
+
+                Result.Success(callTaskList)
             }
         } catch (e: NoSuchElementException) {
             Result.Error(DataError.CallTasksError.Fetch.CallTasksDoesNotExist)
@@ -94,7 +102,7 @@ object CallTasks: LongIdTable("call_tasks") {
                     phoneNumber = callTaskModel[phoneNumber],
                     messageText = callTaskModel[messageText],
                     callAttempts = callTaskModel[callAttempts],
-                    nextCallDateAndTimeUTC = callTaskModel[nextCallDateAndTimeUTC],
+                    nextCallDateTimeUTC = callTaskModel[nextCallDateTimeUTC],
                 )
                 Result.Success(callTaskDto)
             }
@@ -119,7 +127,7 @@ object CallTasks: LongIdTable("call_tasks") {
                             phoneNumber = it[phoneNumber],
                             messageText = it[messageText],
                             callAttempts = it[callAttempts],
-                            nextCallDateAndTimeUTC = it[nextCallDateAndTimeUTC],
+                            nextCallDateTimeUTC = it[nextCallDateTimeUTC],
                         )
                     )
                 }
@@ -128,6 +136,20 @@ object CallTasks: LongIdTable("call_tasks") {
             }
         } catch (e: NoSuchElementException) {
             Result.Error(DataError.CallTasksError.Fetch.CallTasksDoesNotExist)
+        }
+    }
+
+    fun update(dto: CallTaskDto): Result<Unit, DataError.CallTasksError.Update> {
+        return try {
+            transaction {
+                CallTasks.update({ CallTasks.id.eq(dto.id) }) {
+                    it[callAttempts] = dto.callAttempts
+                    it[nextCallDateTimeUTC] = dto.nextCallDateTimeUTC
+                }
+            }
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(DataError.CallTasksError.Update.UnknownError(e))
         }
     }
 

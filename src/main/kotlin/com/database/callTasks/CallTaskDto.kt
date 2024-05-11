@@ -13,5 +13,5 @@ data class CallTaskDto(
     val phoneNumber: String,
     val messageText: String,
     val callAttempts: Int,
-    @Serializable(with = OffsetDateTimeSerializer::class) val nextCallDateAndTimeUTC: OffsetDateTime
+    @Serializable(with = OffsetDateTimeSerializer::class) val nextCallDateTimeUTC: OffsetDateTime
 )

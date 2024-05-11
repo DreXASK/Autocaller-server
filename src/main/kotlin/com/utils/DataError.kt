@@ -12,7 +12,24 @@ sealed interface DataError: Error {
         sealed interface Fetch: CallTasksError {
             data object CallTasksDoesNotExist: Fetch
         }
+        sealed interface Update: CallTasksError {
+            data class UnknownError(val e: Exception): Update
+        }
         sealed interface Remove: CallTasksError {
+            data class UnknownError(val e: Exception): Remove
+        }
+    }
+    sealed interface CallTasksInWorkError: DataError {
+        sealed interface Insert: CallTasksInWorkError {
+            data class UnknownError(val e: Exception): Insert
+        }
+        sealed interface Fetch: CallTasksInWorkError {
+            data object CallTasksDoesNotExist: Fetch
+        }
+        sealed interface Update: CallTasksError {
+            data class UnknownError(val e: Exception): Update
+        }
+        sealed interface Remove: CallTasksInWorkError {
             data class UnknownError(val e: Exception): Remove
         }
     }

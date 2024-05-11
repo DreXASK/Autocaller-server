@@ -2,6 +2,7 @@ package com.features.messageTemplates
 
 import com.database.messageTemplates.MessageTemplates
 import com.database.tokens.Tokens
+import com.features.auth
 import com.utils.DataError
 import com.utils.Result
 import io.ktor.http.*
@@ -14,7 +15,9 @@ class MessageTemplatesController(private val call: ApplicationCall) {
     suspend fun getMessageTemplateFromClient() {
         val receive = call.receive<GetMessageTemplateReceiveRemote>()
 
-        auth(receive.token)
+        if (!auth(receive.token, call)) {
+            return
+        }
 
         val messageTemplateDto = receive.messageTemplate
         when (val result = MessageTemplates.insert(messageTemplateDto)) {
@@ -34,7 +37,9 @@ class MessageTemplatesController(private val call: ApplicationCall) {
     suspend fun sendMessageTemplatesToClient() {
         val receive = call.receive<SendMessageTemplatesReceiveRemote>()
 
-        auth(receive.token)
+        if (!auth(receive.token, call)) {
+            return
+        }
 
         when (val result = MessageTemplates.fetchAll()) {
             is Result.Success -> call.respond(result.data)
@@ -50,7 +55,9 @@ class MessageTemplatesController(private val call: ApplicationCall) {
     suspend fun removeMessageTemplate() {
         val receive = call.receive<RemoveMessageTemplateReceiveRemote>()
 
-        auth(receive.token)
+        if (!auth(receive.token, call)) {
+            return
+        }
 
         when (val result = MessageTemplates.remove(receive.id)) {
             is Result.Success -> call.respond(HttpStatusCode.OK)
@@ -65,14 +72,4 @@ class MessageTemplatesController(private val call: ApplicationCall) {
         }
     }
 
-    private suspend fun auth(token: String) {
-        when (val result = Tokens.fetch(token)) {
-            is Result.Error -> {
-                if (result.error == DataError.TokensError.TokensDoesNotExist)
-                    call.respond(HttpStatusCode.BadRequest, "Invalid token")
-            }
-
-            is Result.Success -> Unit
-        }
-    }
 }
