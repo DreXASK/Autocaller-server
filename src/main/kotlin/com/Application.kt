@@ -47,7 +47,6 @@ suspend fun main() {
                         is Result.Success -> println("The authentication key has been successfully created ${result.data}")
                         is Result.Error -> println("Registration error - ${result.error.exception.message}")
                     }
-
                 }
                 "tokens" -> {
                     when(val result = Tokens.fetchAll()) {
@@ -62,9 +61,7 @@ suspend fun main() {
                         }
                     }
                 }
-                "haha" -> {
-//                    val a = OffsetDateTime.now(ZoneOffset.UTC)
-//                    val b = a.withOffsetSameInstant(ZoneId.systemDefault().rules.getOffset(Instant.now()))
+                "generateTestResultsData" -> {
                     val list = mutableListOf<CompletedTaskDto>()
 
                     repeat(50) {
@@ -88,7 +85,7 @@ suspend fun main() {
 
                     CompletedTasks.insert(list)
                 }
-                "timeUtc" -> {
+                "printTime" -> {
                     println(OffsetTime.now(ZoneOffset.UTC))
                     println(OffsetDateTime.now(ZoneOffset.UTC).plusHours(6))
                 }

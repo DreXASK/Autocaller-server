@@ -20,7 +20,6 @@ object MessageTemplates: LongIdTable("message_templates") {
     private val isSexPlaceholderUsed = bool("is_sex_placeholder_used")
     private val isAgePlaceholderUsed = bool("is_age_placeholder_used")
 
-
     fun insert(messageTemplate: MessageTemplateDto): Result<Unit, DataError.MessageTemplatesError.Insert> {
         return try {
             transaction {
@@ -40,7 +39,6 @@ object MessageTemplates: LongIdTable("message_templates") {
             Result.Error(DataError.MessageTemplatesError.Insert.UnknownError(e))
         }
     }
-
 
     fun fetch(id: Long): Result<MessageTemplateDto, DataError.MessageTemplatesError.Fetch> {
         return try {
