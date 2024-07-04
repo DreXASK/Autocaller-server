@@ -8,4 +8,5 @@
 - Coroutines
 - Ktor (server)
 - PostgreSQL
+- Exposed
 - KotlinX Serialization
